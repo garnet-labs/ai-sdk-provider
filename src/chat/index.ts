@@ -185,14 +185,24 @@ export class OpenRouterChatLanguageModel implements LanguageModelV3 {
           (tool): tool is LanguageModelV3FunctionTool =>
             tool.type === 'function',
         )
-        .map((tool) => ({
-          type: 'function' as const,
-          function: {
-            name: tool.name,
-            description: tool.description,
-            parameters: tool.inputSchema,
-          },
-        }));
+        .map((tool) => {
+          const openrouterOptions = tool.providerOptions?.openrouter as
+            | Record<string, unknown>
+            | undefined;
+          const eagerInputStreaming = openrouterOptions?.eager_input_streaming;
+
+          return {
+            type: 'function' as const,
+            function: {
+              name: tool.name,
+              description: tool.description,
+              parameters: tool.inputSchema,
+            },
+            ...(eagerInputStreaming != null && {
+              eager_input_streaming: eagerInputStreaming,
+            }),
+          };
+        });
 
       return {
         ...baseArgs,
