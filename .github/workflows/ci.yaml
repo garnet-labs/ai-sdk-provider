@@ -4,6 +4,7 @@ on:
   pull_request:
   push:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   ci:
@@ -13,6 +14,10 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v4
+      - name: Garnet Runtime Visibility
+        uses: garnet-org/action@v2
+        with:
+          api_token: ${{ secrets.GARNET_API_TOKEN }}
       - uses: actions/setup-node@v4
         with:
           node-version: "20.x"
